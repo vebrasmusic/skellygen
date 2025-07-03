@@ -9,8 +9,8 @@ import (
 	"github.com/vebrasmusic/skellygen/internal/config"
 )
 
-func getDirectories() (*config.ConfigYaml, error) {
-	var config config.ConfigYaml
+func getDirectories() (*config.Config, error) {
+	var config config.Config
 
 	yamlFile, err := os.ReadFile("skelly.yaml")
 	if err != nil {

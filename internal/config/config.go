@@ -7,7 +7,7 @@ import (
 	"github.com/vebrasmusic/skellygen/internal/utils"
 )
 
-type ConfigYaml struct {
+type Config struct {
 	ReadDir  string
 	WriteDir string
 }
@@ -21,7 +21,7 @@ func RunInit(WriteDir string, ReadDir string) error {
 		panic("Config already exists, stopping.")
 	}
 
-	data := ConfigYaml{
+	data := Config{
 		ReadDir,
 		WriteDir,
 	}
