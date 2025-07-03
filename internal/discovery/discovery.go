@@ -3,6 +3,7 @@ package discovery
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/spf13/afero"
@@ -55,12 +56,7 @@ func FindFiles(cfg *config.Config) ([]FileInfo, error) {
 
 func shouldExcludeDir(path string, excludeDirs []string) bool {
 	dirName := filepath.Base(path)
-	for _, excludeDir := range excludeDirs {
-		if dirName == excludeDir {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(excludeDirs, dirName)
 }
 
 func shouldIncludeFile(path string, filePatterns []string) bool {
@@ -82,3 +78,4 @@ func shouldExcludeFile(path string, excludeFiles []string) bool {
 	}
 	return false
 }
+
