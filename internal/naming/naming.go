@@ -1,13 +1,15 @@
 package naming
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/afero"
 	"github.com/vebrasmusic/skellygen/internal/config"
 	"github.com/vebrasmusic/skellygen/internal/discovery"
 )
+
+var AppFs afero.Fs = afero.NewOsFs()
 
 func GenerateOutputPath(file discovery.FileInfo, cfg *config.Config) string {
 	pattern := cfg.Output.NamingPattern
@@ -22,5 +24,5 @@ func GenerateOutputPath(file discovery.FileInfo, cfg *config.Config) string {
 
 func EnsureOutputDir(outputPath string) error {
 	dir := filepath.Dir(outputPath)
-	return os.MkdirAll(dir, 0755)
+	return AppFs.MkdirAll(dir, 0755)
 }

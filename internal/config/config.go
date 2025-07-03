@@ -1,12 +1,15 @@
 package config
 
 import (
-	"os"
+	"errors"
 	"strings"
 
 	"github.com/goccy/go-yaml"
+	"github.com/spf13/afero"
 	"github.com/vebrasmusic/skellygen/internal/utils"
 )
+
+var AppFs afero.Fs = afero.NewOsFs()
 
 type Project struct {
 	Name    string `yaml:"name"`
@@ -37,7 +40,7 @@ func RunInit(SrcDir string, FilePatterns string, ExcludeDirs string, ExcludeFile
 		return err
 	}
 	if configExists {
-		panic("Config already exists, stopping.")
+		return errors.New("Config already exists, stopping.")
 	}
 
 	filePatterns := []string{"*.tsx", "*.ts", "*.jsx", "*.js"}
@@ -82,13 +85,10 @@ func RunInit(SrcDir string, FilePatterns string, ExcludeDirs string, ExcludeFile
 		return err
 	}
 
-	file, err := os.Create("skelly.yaml")
+	err = afero.WriteFile(AppFs, "skelly.yaml", bytes, 0644)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	defer file.Close()
-
-	file.WriteString(string(bytes))
 
 	return nil
 }

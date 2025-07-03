@@ -5,8 +5,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/afero"
 	"github.com/vebrasmusic/skellygen/internal/config"
 )
+
+var AppFs afero.Fs = afero.NewOsFs()
 
 func ValidateConfig(cfg *config.Config) error {
 	if err := validateInput(cfg.Input); err != nil {
@@ -25,7 +28,7 @@ func validateInput(input config.Input) error {
 		return errors.New("src_dir cannot be empty")
 	}
 
-	if _, err := os.Stat(input.SrcDir); os.IsNotExist(err) {
+	if _, err := AppFs.Stat(input.SrcDir); os.IsNotExist(err) {
 		return errors.New("src_dir does not exist: " + input.SrcDir)
 	}
 

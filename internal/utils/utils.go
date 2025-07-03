@@ -2,8 +2,11 @@ package utils
 
 import (
 	"os"
-	"path/filepath"
+
+	"github.com/spf13/afero"
 )
+
+var AppFs afero.Fs = afero.NewOsFs()
 
 func Check(e error) {
 	if e != nil {
@@ -12,14 +15,9 @@ func Check(e error) {
 }
 
 func CheckForConfig() (bool, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return false, err
-	}
+	filename := "skelly.yaml"
 
-	filename := filepath.Join(cwd, "skelly.yaml")
-
-	_, err = os.Stat(filename)
+	_, err := AppFs.Stat(filename)
 	if err == nil {
 		// file exists
 		return true, nil

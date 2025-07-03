@@ -5,8 +5,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/afero"
 	"github.com/vebrasmusic/skellygen/internal/config"
 )
+
+var AppFs afero.Fs = afero.NewOsFs()
 
 type FileInfo struct {
 	Path         string
@@ -18,7 +21,7 @@ type FileInfo struct {
 func FindFiles(cfg *config.Config) ([]FileInfo, error) {
 	var files []FileInfo
 
-	err := filepath.Walk(cfg.Input.SrcDir, func(path string, info os.FileInfo, err error) error {
+	err := afero.Walk(AppFs, cfg.Input.SrcDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}

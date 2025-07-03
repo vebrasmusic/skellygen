@@ -5,16 +5,19 @@ import (
 	"os"
 
 	"github.com/goccy/go-yaml"
+	"github.com/spf13/afero"
 	"github.com/vebrasmusic/skellygen/internal/config"
 	"github.com/vebrasmusic/skellygen/internal/discovery"
 	"github.com/vebrasmusic/skellygen/internal/naming"
 	"github.com/vebrasmusic/skellygen/internal/validation"
 )
 
+var AppFs afero.Fs = afero.NewOsFs()
+
 func getDirectories() (*config.Config, error) {
 	var config config.Config
 
-	yamlFile, err := os.ReadFile("skelly.yaml")
+	yamlFile, err := afero.ReadFile(AppFs, "skelly.yaml")
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, errors.New("skelly.yaml not found. Please run 'skelly init' first to create a configuration file")
@@ -64,12 +67,12 @@ func ParseInputFile() error {
 }
 
 func generateSkeleton(file discovery.FileInfo, outputPath string) error {
-	content, err := os.ReadFile(file.Path)
+	content, err := afero.ReadFile(AppFs, file.Path)
 	if err != nil {
 		return err
 	}
 
 	skeletonContent := string(content)
 
-	return os.WriteFile(outputPath, []byte(skeletonContent), 0644)
+	return afero.WriteFile(AppFs, outputPath, []byte(skeletonContent), 0644)
 }
