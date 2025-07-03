@@ -18,7 +18,7 @@ type FileInfo struct {
 func FindFiles(cfg *config.Config) ([]FileInfo, error) {
 	var files []FileInfo
 
-	err := filepath.Walk(cfg.Input.ReadDir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(cfg.Input.SrcDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -31,7 +31,7 @@ func FindFiles(cfg *config.Config) ([]FileInfo, error) {
 		}
 
 		if shouldIncludeFile(path, cfg.Input.FilePatterns) && !shouldExcludeFile(path, cfg.Input.ExcludeFiles) {
-			relativePath, err := filepath.Rel(cfg.Input.ReadDir, path)
+			relativePath, err := filepath.Rel(cfg.Input.SrcDir, path)
 			if err != nil {
 				return err
 			}

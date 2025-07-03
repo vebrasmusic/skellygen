@@ -16,14 +16,8 @@ func GenerateOutputPath(file discovery.FileInfo, cfg *config.Config) string {
 	pattern = strings.ReplaceAll(pattern, "{name}", file.Name)
 	pattern = strings.ReplaceAll(pattern, "{ext}", file.Extension)
 	
-	if cfg.Output.PreserveStructure {
-		dir := filepath.Dir(file.RelativePath)
-		if dir != "." {
-			return filepath.Join(cfg.Output.WriteDir, dir, pattern)
-		}
-	}
-	
-	return filepath.Join(cfg.Output.WriteDir, pattern)
+	dir := filepath.Dir(file.Path)
+	return filepath.Join(dir, pattern)
 }
 
 func EnsureOutputDir(outputPath string) error {

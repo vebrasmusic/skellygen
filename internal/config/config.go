@@ -14,14 +14,13 @@ type Project struct {
 }
 
 type Input struct {
-	ReadDir      string   `yaml:"read_dir"`
+	SrcDir       string   `yaml:"src_dir"`
 	FilePatterns []string `yaml:"file_patterns"`
 	ExcludeDirs  []string `yaml:"exclude_dirs"`
 	ExcludeFiles []string `yaml:"exclude_files"`
 }
 
 type Output struct {
-	WriteDir          string `yaml:"write_dir"`
 	NamingPattern     string `yaml:"naming_pattern"`
 	PreserveStructure bool   `yaml:"preserve_structure"`
 }
@@ -32,7 +31,7 @@ type Config struct {
 	Output  Output  `yaml:"output"`
 }
 
-func RunInit(WriteDir string, ReadDir string, FilePatterns string, ExcludeDirs string, ExcludeFiles string, NamingPattern string, PreserveStruct bool) error {
+func RunInit(SrcDir string, FilePatterns string, ExcludeDirs string, ExcludeFiles string, NamingPattern string, PreserveStruct bool) error {
 	configExists, err := utils.CheckForConfig()
 	if err != nil {
 		return err
@@ -67,13 +66,12 @@ func RunInit(WriteDir string, ReadDir string, FilePatterns string, ExcludeDirs s
 			Version: "1.0.0",
 		},
 		Input: Input{
-			ReadDir:      ReadDir,
+			SrcDir:       SrcDir,
 			FilePatterns: filePatterns,
 			ExcludeDirs:  excludeDirs,
 			ExcludeFiles: excludeFiles,
 		},
 		Output: Output{
-			WriteDir:          WriteDir,
 			NamingPattern:     namingPattern,
 			PreserveStructure: PreserveStruct,
 		},

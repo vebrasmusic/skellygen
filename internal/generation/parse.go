@@ -1,6 +1,7 @@
 package generation
 
 import (
+	"errors"
 	"os"
 
 	"github.com/goccy/go-yaml"
@@ -15,6 +16,9 @@ func getDirectories() (*config.Config, error) {
 
 	yamlFile, err := os.ReadFile("skelly.yaml")
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, errors.New("skelly.yaml not found. Please run 'skelly init' first to create a configuration file")
+		}
 		return nil, err
 	}
 
@@ -44,7 +48,7 @@ func ParseInputFile() error {
 
 	for _, file := range files {
 		outputPath := naming.GenerateOutputPath(file, config)
-		
+
 		err := naming.EnsureOutputDir(outputPath)
 		if err != nil {
 			return err

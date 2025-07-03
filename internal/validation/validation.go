@@ -3,7 +3,6 @@ package validation
 import (
 	"errors"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/vebrasmusic/skellygen/internal/config"
@@ -22,12 +21,12 @@ func ValidateConfig(cfg *config.Config) error {
 }
 
 func validateInput(input config.Input) error {
-	if input.ReadDir == "" {
-		return errors.New("read_dir cannot be empty")
+	if input.SrcDir == "" {
+		return errors.New("src_dir cannot be empty")
 	}
 
-	if _, err := os.Stat(input.ReadDir); os.IsNotExist(err) {
-		return errors.New("read_dir does not exist: " + input.ReadDir)
+	if _, err := os.Stat(input.SrcDir); os.IsNotExist(err) {
+		return errors.New("src_dir does not exist: " + input.SrcDir)
 	}
 
 	if len(input.FilePatterns) == 0 {
@@ -44,10 +43,6 @@ func validateInput(input config.Input) error {
 }
 
 func validateOutput(output config.Output) error {
-	if output.WriteDir == "" {
-		return errors.New("write_dir cannot be empty")
-	}
-
 	if output.NamingPattern == "" {
 		return errors.New("naming_pattern cannot be empty")
 	}
@@ -58,13 +53,6 @@ func validateOutput(output config.Output) error {
 
 	if !strings.Contains(output.NamingPattern, "{ext}") {
 		return errors.New("naming_pattern must contain {ext}")
-	}
-
-	writeDir := filepath.Dir(output.WriteDir)
-	if writeDir != "." {
-		if _, err := os.Stat(writeDir); os.IsNotExist(err) {
-			return errors.New("parent directory of write_dir does not exist: " + writeDir)
-		}
 	}
 
 	return nil
