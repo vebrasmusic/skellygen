@@ -2,17 +2,37 @@ package config
 
 import (
 	"os"
+	"strings"
 
 	"github.com/goccy/go-yaml"
 	"github.com/vebrasmusic/skellygen/internal/utils"
 )
 
-type Config struct {
-	ReadDir  string
-	WriteDir string
+type Project struct {
+	Name    string `yaml:"name"`
+	Version string `yaml:"version"`
 }
 
-func RunInit(WriteDir string, ReadDir string) error {
+type Input struct {
+	ReadDir      string   `yaml:"read_dir"`
+	FilePatterns []string `yaml:"file_patterns"`
+	ExcludeDirs  []string `yaml:"exclude_dirs"`
+	ExcludeFiles []string `yaml:"exclude_files"`
+}
+
+type Output struct {
+	WriteDir          string `yaml:"write_dir"`
+	NamingPattern     string `yaml:"naming_pattern"`
+	PreserveStructure bool   `yaml:"preserve_structure"`
+}
+
+type Config struct {
+	Project Project `yaml:"project"`
+	Input   Input   `yaml:"input"`
+	Output  Output  `yaml:"output"`
+}
+
+func RunInit(WriteDir string, ReadDir string, FilePatterns string, ExcludeDirs string, ExcludeFiles string, NamingPattern string, PreserveStruct bool) error {
 	configExists, err := utils.CheckForConfig()
 	if err != nil {
 		return err
@@ -21,9 +41,42 @@ func RunInit(WriteDir string, ReadDir string) error {
 		panic("Config already exists, stopping.")
 	}
 
+	filePatterns := []string{"*.tsx", "*.ts", "*.jsx", "*.js"}
+	if FilePatterns != "" {
+		filePatterns = strings.Split(FilePatterns, ",")
+	}
+
+	excludeDirs := []string{"node_modules", ".git", "dist", "build", ".next"}
+	if ExcludeDirs != "" {
+		excludeDirs = strings.Split(ExcludeDirs, ",")
+	}
+
+	excludeFiles := []string{"*.test.*", "*.spec.*", "*.stories.*"}
+	if ExcludeFiles != "" {
+		excludeFiles = strings.Split(ExcludeFiles, ",")
+	}
+
+	namingPattern := "{component}-skeleton.{ext}"
+	if NamingPattern != "" {
+		namingPattern = NamingPattern
+	}
+
 	data := Config{
-		ReadDir,
-		WriteDir,
+		Project: Project{
+			Name:    "my-project",
+			Version: "1.0.0",
+		},
+		Input: Input{
+			ReadDir:      ReadDir,
+			FilePatterns: filePatterns,
+			ExcludeDirs:  excludeDirs,
+			ExcludeFiles: excludeFiles,
+		},
+		Output: Output{
+			WriteDir:          WriteDir,
+			NamingPattern:     namingPattern,
+			PreserveStructure: PreserveStruct,
+		},
 	}
 
 	bytes, err := yaml.Marshal(data)

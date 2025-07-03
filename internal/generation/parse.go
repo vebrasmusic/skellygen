@@ -2,11 +2,12 @@ package generation
 
 import (
 	"os"
-	"path/filepath"
 
-	esbuild "github.com/evanw/esbuild/pkg/api"
 	"github.com/goccy/go-yaml"
 	"github.com/vebrasmusic/skellygen/internal/config"
+	"github.com/vebrasmusic/skellygen/internal/discovery"
+	"github.com/vebrasmusic/skellygen/internal/naming"
+	"github.com/vebrasmusic/skellygen/internal/validation"
 )
 
 func getDirectories() (*config.Config, error) {
@@ -31,18 +32,40 @@ func ParseInputFile() error {
 		return err
 	}
 
-	path := filepath.Join(config.ReadDir, "test.tsx")
-
-	result := esbuild.Build(esbuild.BuildOptions{
-		EntryPoints: []string{path},
-		Outfile:     filepath.Join(config.WriteDir, "out.js"),
-		Bundle:      true,
-		Write:       true,
-		LogLevel:    esbuild.LogLevelInfo,
-	})
-
-	if len(result.Errors) > 0 {
-		os.Exit(1)
+	err = validation.ValidateConfig(config)
+	if err != nil {
+		return err
 	}
+
+	files, err := discovery.FindFiles(config)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		outputPath := naming.GenerateOutputPath(file, config)
+		
+		err := naming.EnsureOutputDir(outputPath)
+		if err != nil {
+			return err
+		}
+
+		err = generateSkeleton(file, outputPath)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
+}
+
+func generateSkeleton(file discovery.FileInfo, outputPath string) error {
+	content, err := os.ReadFile(file.Path)
+	if err != nil {
+		return err
+	}
+
+	skeletonContent := string(content)
+
+	return os.WriteFile(outputPath, []byte(skeletonContent), 0644)
 }
